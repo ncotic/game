@@ -6,20 +6,9 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
-import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.Ray;
-import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 public class Main extends ApplicationAdapter {
@@ -28,8 +17,6 @@ public class Main extends ApplicationAdapter {
     private World world;
     private PerspectiveCamera camera;
     private PointLight pointLight;
-    private Texture nancy;
-    private ShapeRenderer shapeRenderer;
 
     protected Stage stage;
     protected Label label;
@@ -38,7 +25,6 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void create() {
-        Bullet.init();
         stage = new Stage();
         font = new BitmapFont();
         label = new Label(" ", new Label.LabelStyle(font, Color.WHITE));
@@ -86,17 +72,17 @@ public class Main extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         world.modelBatch.begin(camera);
-        int visibleCount = 0;
+        // int visibleCount = 0;
         for (final World.GameObject instance : world.instances) {
             if (instance.isVisible(camera)) {
                 world.modelBatch.render(instance, environment);
-                visibleCount++;
+                // visibleCount++;
             }
         }
         world.modelBatch.end();
 
-        for (int i = 0; i < world.decals.size; i++) {
-            Decal decal = world.decals.get(i);
+        for (int i = 0; i < World.decals.size; i++) {
+            Decal decal = World.decals.get(i);
             decal.lookAt(new Vector3(camera.position.x, decal.getPosition().y, camera.position.z), camera.up);
             world.decalBatch.add(decal);
         }
@@ -113,7 +99,9 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         world.modelBatch.dispose();
+        world.decalBatch.dispose();
         world.instances.clear();
+        World.decals.clear();
         world.assets.dispose();
     }
 }
