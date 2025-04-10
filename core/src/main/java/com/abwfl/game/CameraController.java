@@ -72,14 +72,16 @@ public class CameraController {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-            if (round(playerHeight*10) == 40) {
+            if (floor(playerHeight*10) < 4 || playerHeight == .4f) {
                 playerHeight = .4f;
+                moveSpeed = 80f;
             } else if (playerHeight > .4f) {
                 playerHeight -= .05f;
             }
         } else {
-            if (round(playerHeight*10) == 60) {
+            if (ceil(playerHeight*10) > 6 || playerHeight == .6f) {
                 playerHeight = .6f;
+                moveSpeed = 40f;
             } else if (playerHeight < .6f) {
                 playerHeight += .05f;
             }
