@@ -3,7 +3,6 @@ package com.abwfl.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
@@ -11,16 +10,14 @@ import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 
 import static com.badlogic.gdx.math.MathUtils.lerp;
 
 public class World {
-    private int[][] building = {{0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+    private final int[][] building = {{0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0},
                                 {0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
                                 {0, 0, 1, 1, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0},
                                 {0, 0, 1, 1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -36,7 +33,7 @@ public class World {
                                 {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
-    private float[][] ground = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    private final float[][] ground = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -56,7 +53,7 @@ public class World {
     public DecalBatch decalBatch;
     public AssetManager assets;
     public final Array<GameObject> instances = new Array<>();
-    public final Array<Decal> decals = new Array<>();
+    public static final Array<Decal> decals = new Array<>();
 
     public Model space;
 
@@ -64,38 +61,33 @@ public class World {
     private Texture concreteTex;
     private Texture grassTex;
     private Texture spaceTex;
-    private Texture suzieTex;
 
-    private Decal suzie;
-
-    private float distance = 0f;
-
-    private Vector3 position = new Vector3();
-
-    public int getObject (Camera camera) {
-        Ray ray = camera.getPickRay(0, 0);
-
-        int result = -1;
-        float distance = -1;
-
-        for (int i = 0; i < instances.size; ++i) {
-            final World.GameObject instance = instances.get(i);
-
-            instance.transform.getTranslation(position);
-            position.add(instance.center);
-
-            float dist2 = ray.origin.dst2(position);
-            if (distance >= 0f && dist2 > distance)
-                continue;
-
-            if (Intersector.intersectRaySphere(ray, position, instance.radius, null)) {
-                result = i;
-                distance = dist2;
-            }
-        }
-
-        return result;
-    }
+    //    private final Vector3 position = new Vector3();
+//
+//    public int getObject (Camera camera) {
+//        Ray ray = camera.getPickRay(0, 0);
+//
+//        int result = -1;
+//        float distance = -1;
+//
+//        for (int i = 0; i < instances.size; ++i) {
+//            final World.GameObject instance = instances.get(i);
+//
+//            instance.transform.getTranslation(position);
+//            position.add(instance.center);
+//
+//            float dist2 = ray.origin.dst2(position);
+//            if (distance >= 0f && dist2 > distance)
+//                continue;
+//
+//            if (Intersector.intersectRaySphere(ray, position, instance.radius, null)) {
+//                result = i;
+//                distance = dist2;
+//            }
+//        }
+//
+//        return result;
+//    }
 
     public static class GameObject extends ModelInstance {
         public final Vector3 center = new Vector3();
@@ -130,13 +122,8 @@ public class World {
         concreteTex = new Texture("concrete.png");
         grassTex = new Texture("grass.png");
         spaceTex = new Texture("space.png");
-        suzieTex = new Texture("suzie.png");
-        TextureRegion suzieTexRegion = new TextureRegion(suzieTex);
 
-        suzie = Decal.newDecal(suzieTexRegion, true);
-        suzie.setPosition(8,0.375f,-1);
-        suzie.setScale(0.015f);
-        decals.add(suzie);
+        Character suzie = new Character(new Texture("suzie.png"), new Vector3(8,.35f,-1), 0.015f);
 
         int attr = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
         ModelBuilder modelBuilder = new ModelBuilder();
@@ -216,41 +203,6 @@ public class World {
         }
     }
 
-    public void update(Camera camera) {
-        instances.get(0).transform.rotate(0.1f, 0.0f, 0.2f,0.1f);
-        double ac = Math.abs(camera.position.z - suzie.getPosition().z);
-        double cb = Math.abs(camera.position.x - suzie.getPosition().x);
-        distance = (float)Math.hypot(ac, cb);
-        if (distance > 1.9) {
-            distance = 1.9f;
-        }
-        suzie.setColor(-distance/2+3,-distance/2+3,-distance/2+3,1);
-    }
-
-    public int getCollision(float x, float y) {
-        try {
-            if (building[Math.round(y)][Math.round(x)] != 0) {
-                return 0;
-            } else {
-                return 1;
-            }
-        }
-        catch(ArrayIndexOutOfBoundsException exception) {
-            return 0;
-        }
-    }
-
-    public float getHeight(float x, float y) {
-        try {
-            float a1 = x - (int) (x);
-            float a2 = y - (int) (y);
-            return lerp(lerp(ground[(int)Math.floor(y)][(int)Math.floor(x)],ground[(int)Math.floor(y)][(int)Math.ceil(x)], a1), lerp(ground[(int)Math.ceil(y)][(int)Math.floor(x)], ground[(int)Math.ceil(y)][(int)Math.ceil(x)], a1), a2);
-        }
-        catch(ArrayIndexOutOfBoundsException exception) {
-            return 0;
-        }
-    }
-
     private void drawWall(float x, float y, float h, int dir) {
         int attr = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
         ModelBuilder modelBuilder = new ModelBuilder();
@@ -279,5 +231,42 @@ public class World {
         }
         Model wall = modelBuilder.end();
         instances.add(new GameObject(wall));
+    }
+
+    public void update(Camera camera) {
+        instances.get(0).transform.rotate(0.1f, 0.0f, 0.2f,0.1f);
+        for (int i = 0; i < decals.size; i++) {
+            double ac = Math.abs(camera.position.z - decals.get(i).getPosition().z);
+            double cb = Math.abs(camera.position.x - decals.get(i).getPosition().x);
+            float distance = (float) Math.hypot(ac, cb);
+            if (distance > 1.9) {
+                distance = 1.9f;
+            }
+            decals.get(i).setColor(-distance / 2 + 3, -distance / 2 + 3, -distance / 2 + 3, 1);
+        }
+    }
+
+    public int getCollision(float x, float y) {
+        try {
+            if (building[Math.round(y)][Math.round(x)] != 0) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+        catch(ArrayIndexOutOfBoundsException exception) {
+            return 0;
+        }
+    }
+
+    public float getHeight(float x, float y) {
+        try {
+            float a1 = x - (int) (x);
+            float a2 = y - (int) (y);
+            return lerp(lerp(ground[(int)Math.floor(y)][(int)Math.floor(x)],ground[(int)Math.floor(y)][(int)Math.ceil(x)], a1), lerp(ground[(int)Math.ceil(y)][(int)Math.floor(x)], ground[(int)Math.ceil(y)][(int)Math.ceil(x)], a1), a2);
+        }
+        catch(ArrayIndexOutOfBoundsException exception) {
+            return 0;
+        }
     }
 }

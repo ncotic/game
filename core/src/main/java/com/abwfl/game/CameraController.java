@@ -3,18 +3,16 @@ package com.abwfl.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 
 import static com.badlogic.gdx.math.MathUtils.*;
 
 public class CameraController {
     public Camera camera;
-    private World world = new World();
+    private final World world = new World();
 
-    private Vector3 position = new Vector3(7f,0.1f,-4f);
+    private final Vector3 position = new Vector3(7f,0.1f,-4f);
 
-    private int offset = 0;
     float moveSpeed = 40f;
 
     public float playerHeight = .6f;
@@ -22,8 +20,8 @@ public class CameraController {
 
     private float rotSpeed = 200f;
 
-    private Vector3 moveVector = new Vector3();
-    private Vector3 tmpVector = new Vector3();
+    private final Vector3 moveVector = new Vector3();
+    private final Vector3 tmpVector = new Vector3();
 
     public CameraController(Camera cam, int sens){
         camera = cam;
@@ -73,11 +71,18 @@ public class CameraController {
             }
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            int object = world.getObject(camera);
-            if (object != -1) {
-                world.instances.removeIndex(object);
-            } else System.out.println("Nope.");
+        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+            if (round(playerHeight*10) == 40) {
+                playerHeight = .4f;
+            } else if (playerHeight > .4f) {
+                playerHeight -= .05f;
+            }
+        } else {
+            if (round(playerHeight*10) == 60) {
+                playerHeight = .6f;
+            } else if (playerHeight < .6f) {
+                playerHeight += .05f;
+            }
         }
 
         move();
@@ -121,7 +126,6 @@ public class CameraController {
 
         position.y = world.getHeight(position.x,position.z+19);
 
-
-        camera.position.set(position.x, position.y + playerHeight + offset, position.z);
+        camera.position.set(position.x, position.y + playerHeight, position.z);
     }
 }
