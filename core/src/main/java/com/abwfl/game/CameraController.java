@@ -5,18 +5,22 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
+import java.util.Map;
+
 import static com.badlogic.gdx.math.MathUtils.*;
 
 public class CameraController {
     public Camera camera;
     private final World world = new World();
 
-    private final Vector3 position = new Vector3(7f,0.1f,-4f);
+    private final Vector3 position = new Vector3(-1f,0.1f,-7f);
 
     float moveSpeed = 40f;
 
     public float playerHeight = .6f;
     float colliderSize = .2f;
+
+    public static Map.Entry<Character, Float> closest;
 
     private float rotSpeed = 200f;
 
@@ -71,6 +75,12 @@ public class CameraController {
             }
         }
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            if (closest != null && !Character.speaking) {
+                Character.speak(closest.getKey());
+            }
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
             if (floor(playerHeight*10) < 4 || playerHeight == .4f) {
                 playerHeight = .4f;
@@ -119,14 +129,14 @@ public class CameraController {
         float colX = moveVector.nor().x/moveSpeed==0 ? 0 : (moveVector.nor().x/moveSpeed>0 ? 1 : -1);
         float colZ = moveVector.nor().z/moveSpeed==0 ? 0 : (moveVector.nor().z/moveSpeed>0 ? 1 : -1);
 
-        if (world.getCollision(position.x + moveVector.nor().x/moveSpeed + colX * colliderSize, position.z+colliderSize) == 0)
-            if (world.getCollision(position.x + moveVector.nor().x/moveSpeed + colX * colliderSize, position.z-colliderSize) == 0)
-                position.add(moveVector.nor().x/moveSpeed, 0, 0);
-        if (world.getCollision(position.x+colliderSize, position.z + moveVector.nor().z/moveSpeed + colZ * colliderSize) == 0)
-            if (world.getCollision(position.x-colliderSize, position.z + moveVector.nor().z/moveSpeed + colZ * colliderSize) == 0)
-                position.add(0, 0, moveVector.nor().z/moveSpeed);
+        if (world.getCollision(position.x + 8.5f + moveVector.nor().x / moveSpeed + colX * colliderSize, position.z + colliderSize + 5.5f) == 0)
+            if (world.getCollision(position.x + 8.5f + moveVector.nor().x / moveSpeed + colX * colliderSize, position.z - colliderSize + 5.5f) == 0)
+                position.add(moveVector.nor().x / moveSpeed, 0, 0);
+        if (world.getCollision(position.x + colliderSize + 8.5f, position.z + moveVector.nor().z / moveSpeed + colZ * colliderSize + 5.5f) == 0)
+            if (world.getCollision(position.x - colliderSize + 8.5f, position.z + moveVector.nor().z / moveSpeed + colZ * colliderSize + 5.5f) == 0)
+                position.add(0, 0, moveVector.nor().z / moveSpeed);
 
-        position.y = world.getHeight(position.x,position.z+19);
+        position.y = World.getHeight(position.x/2+32,position.z/2+32);
 
         camera.position.set(position.x, position.y + playerHeight, position.z);
     }

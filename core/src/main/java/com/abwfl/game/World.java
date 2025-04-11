@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
@@ -14,46 +13,38 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.badlogic.gdx.math.MathUtils.lerp;
 
 public class World {
-    private final int[][] building = {{0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 1, 1, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 1, 1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 1, 0, 2, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0},
-                                {0, 0, 1, 0, 2, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0},
-                                {0, 0, 1, 0, 2, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0},
-                                {0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-                                {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-                                {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+    private final int[][] building = {{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 1, 2, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 1, 2, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 0, 2, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 0, 2, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 0, 2, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+                                    {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+                                    {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+                                    {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+                                    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
-    private final float[][] ground = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, -.25f, 0, 0, 0, .2f, .2f, 0, 0, 0, 0, 0, 0, 0},
-                                {0, -.25f, -.5f, -.25f, 0, .2f, .5f, .5f, .2f, 0, 0, 0, 0, 0, 0},
-                                {0, 0, -.25f, 0, 0, .2f, .5f, .5f, .2f, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, .2f, .2f, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+    private static float[][] ground;
 
     public ModelBatch modelBatch;
     public DecalBatch decalBatch;
     public AssetManager assets;
     public final Array<GameObject> instances = new Array<>();
-    public static final Array<Decal> decals = new Array<>();
+    public static final Array<Character> decals = new Array<>();
+    public static final Map<Character, Float> charDistances = new HashMap<>();
 
     public Model space;
 
@@ -61,33 +52,6 @@ public class World {
     private Texture concreteTex;
     private Texture grassTex;
     private Texture spaceTex;
-
-    //    private final Vector3 position = new Vector3();
-//
-//    public int getObject (Camera camera) {
-//        Ray ray = camera.getPickRay(0, 0);
-//
-//        int result = -1;
-//        float distance = -1;
-//
-//        for (int i = 0; i < instances.size; ++i) {
-//            final World.GameObject instance = instances.get(i);
-//
-//            instance.transform.getTranslation(position);
-//            position.add(instance.center);
-//
-//            float dist2 = ray.origin.dst2(position);
-//            if (distance >= 0f && dist2 > distance)
-//                continue;
-//
-//            if (Intersector.intersectRaySphere(ray, position, instance.radius, null)) {
-//                result = i;
-//                distance = dist2;
-//            }
-//        }
-//
-//        return result;
-//    }
 
     public static class GameObject extends ModelInstance {
         public final Vector3 center = new Vector3();
@@ -123,7 +87,29 @@ public class World {
         grassTex = new Texture("grass.png");
         spaceTex = new Texture("space.png");
 
-        Character suzie = new Character(new Texture("suzie.png"), new Vector3(8,.35f,-1), 0.015f);
+        try {
+            BufferedImage noiseBI = ImageIO.read(new File("noise.png"));
+            int width = noiseBI.getWidth();
+            int height = noiseBI.getHeight();
+            ground = new float[height][width];
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    String hexColor = String.format("#%06X", (0xFFFFFF & noiseBI.getRGB(col, row)));
+                    ground[row][col] = Color.valueOf(hexColor).r*3-2;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (int y = 27; y < 37; y++) {
+            for (int x = 27; x < 37; x++) {
+                ground[y][x] = 0f;
+            }
+        }
+
+        new Character(new Texture("suzie.png"), new Vector3(0,.35f,-6), 0.015f, "suzie");
+        new Character(new Texture("levan.png"), new Vector3(-2, .35f, -6), 0.003f, "levan");
 
         int attr = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
         ModelBuilder modelBuilder = new ModelBuilder();
@@ -144,7 +130,9 @@ public class World {
                     meshPartBuilder.rect(x+0.5f, 0, y+0.5f, x+0.5f, 0, y, x, 0, y, x, 0, y+0.5f, 0, 1, 0);
                     meshPartBuilder.rect(x, 0, y+0.5f, x, 0, y, x-0.5f, 0, y, x-0.5f, 0, y+0.5f, 0, 1, 0);
                     Model floof = modelBuilder.end();
-                    instances.add(new GameObject(floof));
+                    GameObject floofobj = new GameObject(floof);
+                    floofobj.transform.trn(-8.5f,0f,-5.5f);
+                    instances.add(floofobj);
                     if (x - 1 >= 0 && building[y][x-1] < building[y][x]) {
                         for (int i = building[y][x-1]; i < building[y][x]; i++) {
                             drawWall(x - 1, y, i, 0);
@@ -172,10 +160,18 @@ public class World {
             if (building[0][x] == 0) {
                 drawWall(x, 0, 0, 3);
             }
+            drawWall(x, building.length-1, 0, 2);
+            drawWall(x, building.length-1, 1, 2);
             drawWall(x, 0, 1, 3);
         }
-        for (int y = -5; y < 0; y++) {
-            for (int x = 0; x < 15; x++) {
+        for (int y = 0; y < building.length; y++) {
+            drawWall(building[0].length-1, y, 0, 0);
+            drawWall(building[0].length-1, y, 1, 0);
+            drawWall(0, y, 0, 1);
+            drawWall(0, y, 1, 1);
+        }
+        for (int y = -3; y < 0; y++) {
+            for (int x = 0; x < 16; x++) {
                 modelBuilder.begin();
                 MeshPartBuilder meshPartBuilder = modelBuilder.part("outcon", GL20.GL_TRIANGLES, attr, new Material(TextureAttribute.createDiffuse(concreteTex)));
                 meshPartBuilder.rect(x, 0, y, x, 0, y-0.5f, x-0.5f, 0, y-0.5f, x-0.5f, 0, y, 0, 1, 0);
@@ -183,22 +179,28 @@ public class World {
                 meshPartBuilder.rect(x+0.5f, 0, y+0.5f, x+0.5f, 0, y, x, 0, y, x, 0, y+0.5f, 0, 1, 0);
                 meshPartBuilder.rect(x, 0, y+0.5f, x, 0, y, x-0.5f, 0, y, x-0.5f, 0, y+0.5f, 0, 1, 0);
                 Model outcon = modelBuilder.end();
-                instances.add(new GameObject(outcon));
+                GameObject outconobj = new GameObject(outcon);
+                outconobj.transform.trn(-8.5f,0f,-5.5f);
+                instances.add(outconobj);
             }
         }
 
         for (int y = 1; y < ground.length-1; y++) {
             for (int x = 1; x < ground[y].length-1; x++) {
-                modelBuilder.begin();
-                MeshPartBuilder meshPartBuilder = modelBuilder.part("grounds", GL20.GL_TRIANGLES, attr, new Material(TextureAttribute.createDiffuse(grassTex)));
-                meshPartBuilder.rect(x, ground[y][x], y, x, (ground[y][x]+ground[y-1][x])/2, y-0.5f, x-0.5f, (ground[y][x]+ground[y][x-1]+ground[y-1][x-1]+ground[y-1][x])/4, y-0.5f, x-0.5f, (ground[y][x]+ground[y][x-1])/2, y, 0, 1, 0);
-                meshPartBuilder.rect(x+0.5f, (ground[y][x]+ground[y][x+1])/2, y, x+0.5f, (ground[y][x]+ground[y][x+1]+ground[y-1][x+1]+ground[y-1][x])/4, y-0.5f, x, (ground[y][x]+ground[y-1][x])/2, y-0.5f, x, ground[y][x], y, 0, 1, 0);
-                meshPartBuilder.rect(x+0.5f, (ground[y][x]+ground[y][x+1]+ground[y+1][x+1]+ground[y+1][x])/4, y+0.5f, x+0.5f, (ground[y][x]+ground[y][x+1])/2, y, x, ground[y][x], y, x, (ground[y][x]+ground[y+1][x])/2, y+0.5f, 0, 1, 0);
-                meshPartBuilder.rect(x, (ground[y][x]+ground[y+1][x])/2, y+0.5f, x, ground[y][x], y, x-0.5f, (ground[y][x]+ground[y][x-1])/2, y, x-0.5f, (ground[y][x]+ground[y][x-1]+ground[y+1][x-1]+ground[y+1][x])/4, y+0.5f, 0, 1, 0);
-                Model grounds = modelBuilder.end();
-                GameObject groundsobj = new GameObject(grounds);
-                groundsobj.transform.trn(0f,0f,-19f);
-                instances.add(groundsobj);
+                if (!(x >= 28 && x <= 35 && y >= 28 && y <= 35)) {
+                    int xLoc = x*2;
+                    int yLoc = y*2;
+                    modelBuilder.begin();
+                    MeshPartBuilder meshPartBuilder = modelBuilder.part("grounds", GL20.GL_TRIANGLES, attr, new Material(TextureAttribute.createDiffuse(grassTex)));
+                    meshPartBuilder.rect(xLoc, ground[y][x], yLoc, xLoc, (ground[y][x]+ground[y-1][x])/2, yLoc-1f, xLoc-1f, (ground[y][x]+ground[y][x-1]+ground[y-1][x-1]+ground[y-1][x])/4, yLoc-1f, xLoc-1f, (ground[y][x]+ground[y][x-1])/2, yLoc, 0, 1, 0);
+                    meshPartBuilder.rect(xLoc+1f, (ground[y][x]+ground[y][x+1])/2, yLoc, xLoc+1f, (ground[y][x]+ground[y][x+1]+ground[y-1][x+1]+ground[y-1][x])/4, yLoc-1f, xLoc, (ground[y][x]+ground[y-1][x])/2, yLoc-1f, xLoc, ground[y][x], yLoc, 0, 1, 0);
+                    meshPartBuilder.rect(xLoc+1f, (ground[y][x]+ground[y][x+1]+ground[y+1][x+1]+ground[y+1][x])/4, yLoc+1f, xLoc+1f, (ground[y][x]+ground[y][x+1])/2, yLoc, xLoc, ground[y][x], yLoc, xLoc, (ground[y][x]+ground[y+1][x])/2, yLoc+1f, 0, 1, 0);
+                    meshPartBuilder.rect(xLoc, (ground[y][x]+ground[y+1][x])/2, yLoc+1f, xLoc, ground[y][x], yLoc, xLoc-1f, (ground[y][x]+ground[y][x-1])/2, yLoc, xLoc-1f, (ground[y][x]+ground[y][x-1]+ground[y+1][x-1]+ground[y+1][x])/4, yLoc+1f, 0, 1, 0);
+                    Model grounds = modelBuilder.end();
+                    GameObject groundsobj = new GameObject(grounds);
+                    groundsobj.transform.trn(-64f,0f,-64f);
+                    instances.add(groundsobj);
+                }
             }
         }
     }
@@ -230,20 +232,29 @@ public class World {
             meshPartBuilder.rect(x+0.5f, h, y-0.5f, x, h, y-0.5f, x, h+0.5f, y-0.5f, x+0.5f, h+0.5f, y-0.5f, 0, 0, -1);
         }
         Model wall = modelBuilder.end();
-        instances.add(new GameObject(wall));
+        GameObject wallobj = new GameObject(wall);
+        wallobj.transform.trn(-8.5f,0f,-5.5f);
+        instances.add(wallobj);
     }
 
     public void update(Camera camera) {
         instances.get(0).transform.rotate(0.1f, 0.0f, 0.2f,0.1f);
+        charDistances.clear();
         for (int i = 0; i < decals.size; i++) {
             double ac = Math.abs(camera.position.z - decals.get(i).getPosition().z);
             double cb = Math.abs(camera.position.x - decals.get(i).getPosition().x);
             float distance = (float) Math.hypot(ac, cb);
             if (distance > 1.9) {
                 distance = 1.9f;
+            } else if (distance < 1.0) {
+                charDistances.put(decals.get(i), distance);
             }
-            decals.get(i).setColor(-distance / 2 + 3, -distance / 2 + 3, -distance / 2 + 3, 1);
+            decals.get(i).decal.setColor(-distance / 2 + 3, -distance / 2 + 3, -distance / 2 + 3, 1);
         }
+        charDistances.entrySet()
+            .stream()
+            .min(Map.Entry.comparingByValue())
+            .ifPresentOrElse(closest -> CameraController.closest = closest, () -> CameraController.closest = null);
     }
 
     public int getCollision(float x, float y) {
@@ -255,11 +266,15 @@ public class World {
             }
         }
         catch(ArrayIndexOutOfBoundsException exception) {
-            return 0;
+            if (!(x-7.5f < 62 && x-7.5f > -62 && y-4.5f < 62 && y-4.5f > -62)) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
     }
 
-    public float getHeight(float x, float y) {
+    public static float getHeight(float x, float y) {
         try {
             float a1 = x - (int) (x);
             float a2 = y - (int) (y);

@@ -5,11 +5,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+
+import java.util.Arrays;
 
 public class Main extends ApplicationAdapter {
     private Environment environment;
@@ -48,7 +51,7 @@ public class Main extends ApplicationAdapter {
         cameraController = new CameraController(camera, 1);
 
         environment = new Environment();
-        // environment.add(pointLight = new PointLight().set(0.8f, 0.8f, 0.8f, 0f, 0f, 0f, 4f));
+        //environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 0.1f));
         environment.add(pointLight = new PointLight().set(1, 1, 1, 0f, 0f, 0f, 3f));
     }
 
@@ -82,7 +85,7 @@ public class Main extends ApplicationAdapter {
         world.modelBatch.end();
 
         for (int i = 0; i < World.decals.size; i++) {
-            Decal decal = World.decals.get(i);
+            Decal decal = World.decals.get(i).decal;
             decal.lookAt(new Vector3(camera.position.x, decal.getPosition().y, camera.position.z), camera.up);
             world.decalBatch.add(decal);
         }

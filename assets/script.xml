@@ -1,0 +1,32 @@
+<main>
+    <character id="suzie">
+        <text val="Kris where the fuck am i">
+            <option val="I'm not Kris.">
+                <text val="damn">
+                </text>
+            </option>
+            <option val="Undertale.">
+                <text val="oh shit fr?">
+                    <option val="yeah.">
+                        <text val="sick">
+                        </text>
+                    </option>
+                    <option val="no it was a bit">
+                        <text val="damn">
+                        </text>
+                    </option>
+                </text>
+            </option>
+        </text>
+    </character>
+    <character id="levan">
+        <text val="I hate you.">
+            <option val="why?">`
+                <text val="because you stink">
+                </text>
+            </option>
+            <option val="i hate you too">
+            </option>
+        </text>
+    </character>
+</main>
