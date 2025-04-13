@@ -44,6 +44,38 @@ public class CameraController {
             Gdx.input.setCursorCatched(false);
         }
 
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            if (closest != null && !Character.speaking) {
+                Character.speak(closest.getKey());
+            }
+        }
+
+        if (!Character.speaking)
+            move();
+    }
+
+    private void move(){
+        float dt = Gdx.graphics.getDeltaTime();
+
+        moveVector.setZero();
+
+        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+            if (floor(playerHeight*10) < 4 || playerHeight == .4f) {
+                playerHeight = .4f;
+                moveSpeed = 80f;
+            } else if (playerHeight > .4f) {
+                playerHeight -= .05f;
+            }
+        } else {
+            if (ceil(playerHeight*10) > 6 || playerHeight == .6f) {
+                playerHeight = .6f;
+                moveSpeed = 40f;
+            } else if (playerHeight < .6f) {
+                playerHeight += .05f;
+            }
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camera.rotate(Vector3.Y, rotSpeed * dt);
         }
@@ -74,36 +106,6 @@ public class CameraController {
                 camera.direction.y += 3 * degRad;
             }
         }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            if (closest != null && !Character.speaking) {
-                Character.speak(closest.getKey());
-            }
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-            if (floor(playerHeight*10) < 4 || playerHeight == .4f) {
-                playerHeight = .4f;
-                moveSpeed = 80f;
-            } else if (playerHeight > .4f) {
-                playerHeight -= .05f;
-            }
-        } else {
-            if (ceil(playerHeight*10) > 6 || playerHeight == .6f) {
-                playerHeight = .6f;
-                moveSpeed = 40f;
-            } else if (playerHeight < .6f) {
-                playerHeight += .05f;
-            }
-        }
-
-        move();
-    }
-
-    private void move(){
-        float dt = Gdx.graphics.getDeltaTime();
-
-        moveVector.setZero();
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             tmpVector.set(camera.direction);
