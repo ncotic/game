@@ -88,7 +88,7 @@ public class World {
         spaceTex = new Texture("space.png");
 
         try {
-            BufferedImage noiseBI = ImageIO.read(Gdx.files.internal("noise.png").file());
+            BufferedImage noiseBI = ImageIO.read(Gdx.files.internal("noise.png").read());
             int width = noiseBI.getWidth();
             int height = noiseBI.getHeight();
             ground = new float[height][width];
