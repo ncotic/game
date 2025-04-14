@@ -4,14 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.math.Vector3;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
 
 public class Character {
     Decal decal;
@@ -62,15 +54,15 @@ public class Character {
     }
 
     public static void speak(Character character) {
-        try {
-            File file = new File("script.xml");
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document script = db.parse(file);
-            speaking = true;
-        } catch (ParserConfigurationException | IOException | SAXException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            File file = new File("script.xml");
+//            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder db = dbf.newDocumentBuilder();
+//            Document script = db.parse(file);
+//            speaking = true;
+//        } catch (ParserConfigurationException | IOException | SAXException e) {
+//            throw new RuntimeException(e);
+//        }
 
         System.out.println("Speaking character " + character.getName());
     }
